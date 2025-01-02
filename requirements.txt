@@ -1,0 +1,12 @@
+beautifulsoup4==4.12.3
+aiohttp==3.11.11
+user-agent== 0.1.10
+loguru==0.7.3
+fastapi==0.115.6
+uvicorn==0.34.0
+python-dotenv==1.0.1
+gunicorn==23.0.0
+aiogram==3.17.0
+
+isort==5.13.2
+black==24.10.0
