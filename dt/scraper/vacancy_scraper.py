@@ -50,7 +50,9 @@ class VacancyScraper:
                         content = await response.text()
                         self.soup = BeautifulSoup(content, "html.parser")
             except aiohttp.ClientError as e:
-                print(f"Failed to load the page with proxy {self.proxy}: {e}")
+                print(
+                    f"Failed to load the page with proxy {self.proxy}: {e}"
+                )
                 if self.proxy:
                     self.proxy = None
                     await self.fetch_page()
@@ -95,9 +97,7 @@ class VacancyScraper:
             day, month_name = date_parts
             day = int(day)
             month = MONTHS_MAPPING.get(month_name.lower())
-            return (
-                    month and month.value == date.month and day == date.day
-            )
+            return month and month.value == date.month and day == date.day
         return False
 
     @staticmethod

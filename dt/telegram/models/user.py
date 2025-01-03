@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
-from dt.telegram.db.session import Base
+from dt.telegram.models import Base
 
 
 class BotUser(Base):
@@ -10,6 +10,7 @@ class BotUser(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, unique=True, nullable=False)
+    chat_id = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     subscriptions = relationship(
@@ -23,7 +24,9 @@ class UserSubscription(Base):
     __tablename__ = "user_subscriptions"  # noqa
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("bot_users.id"), nullable=False)
+    user_id = Column(
+        String, ForeignKey("bot_users.user_id"), nullable=False
+    )
     subscription_name = Column(String, nullable=False)
     subscribed_at = Column(DateTime, default=datetime.utcnow)
 

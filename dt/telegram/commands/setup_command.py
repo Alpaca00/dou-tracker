@@ -18,4 +18,5 @@ async def setup_commands(bot_handler):
         for cmd, desc in descriptions.__dict__.items()
         if not cmd.startswith("__")
     ]
+    await bot_handler.bot.delete_my_commands()
     await bot_handler.bot.set_my_commands(commands)

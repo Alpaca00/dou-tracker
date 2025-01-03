@@ -10,7 +10,9 @@ class Config:
         """Get a section as an attribute."""
         if section in self.config:
             return ConfigSection(self.config[section])
-        raise AttributeError(f"Section '{section}' not found in configuration.")
+        raise AttributeError(
+            f"Section '{section}' not found in configuration."
+        )
 
 
 class ConfigSection:

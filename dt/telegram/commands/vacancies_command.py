@@ -26,7 +26,7 @@ class VacanciesCommand(Command):
             )
 
             await message.answer(
-                html.code("Оберіть категорію вакансій"),
+                html.quote("Оберіть категорію вакансій"),
                 reply_markup=category_keyboard,
                 parse_mode=ParseMode.HTML,
             )

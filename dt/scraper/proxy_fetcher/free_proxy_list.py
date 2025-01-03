@@ -15,7 +15,7 @@ class ProxyFetcherFreeProxyList:
         proxy_origin_host: str = conf.URI.proxy_origin_host,
         proxy_fallback_host: str = conf.URI.proxy_fallback_host,
         proxy_verify_host: str = conf.URI.proxy_verify_host,
-        debug: bool = bool(ast.literal_eval(conf.PROJECT.logging))
+        debug: bool = bool(ast.literal_eval(conf.PROJECT.logging)),
     ):
         self.proxy_origin_host = proxy_origin_host
         self.proxy_fallback_host = proxy_fallback_host
@@ -27,7 +27,9 @@ class ProxyFetcherFreeProxyList:
         """Fetches a list of proxies from URL."""
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(self.proxy_origin_host) as response:
+                async with session.get(
+                    self.proxy_origin_host
+                ) as response:
                     response.raise_for_status()
                     html = await response.text()
                     soup = BeautifulSoup(html, "html.parser")

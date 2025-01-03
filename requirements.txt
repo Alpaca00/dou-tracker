@@ -10,6 +10,7 @@ aiogram==3.17.0
 httpx==0.28.1
 deepdiff==8.1.1
 SQLAlchemy==2.0.36
+psycopg2-binary==2.9.10
 APScheduler==3.11.0
 
 isort==5.13.2

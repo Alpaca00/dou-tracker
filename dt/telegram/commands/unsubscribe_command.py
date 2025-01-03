@@ -2,20 +2,25 @@ from aiogram import html
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.enums import ParseMode
 
-from dt.scraper.models import JobCategories
 from dt.telegram.commands import Command
+from dt.telegram.db.session import initialize_database
 
 
-class SubscribeVacanciesCommand(Command):
+class UnsubscribeVacanciesCommand(Command):
+    """Command to unsubscribe from job categories."""
 
     async def execute(self, message):
-        if message.text == f"{self.prefix}subscribe":
+        if message.text == f"{self.prefix}unsubscribe":
+            db = initialize_database()
+            user_subscriptions = db.get_user_subscriptions(
+                user_id=message.from_user.id
+            )
             category_buttons = [
                 InlineKeyboardButton(
-                    text=category.value,
-                    callback_data=f"subscribe_{category.value}",
+                    text=category,
+                    callback_data=f"unsubscribe_{category}",
                 )
-                for category in JobCategories.get_all_categories()
+                for category in user_subscriptions
             ]
 
             category_keyboard = InlineKeyboardMarkup(

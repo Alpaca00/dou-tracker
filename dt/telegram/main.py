@@ -1,6 +1,9 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+)
 
 import json
 import logging
@@ -113,7 +116,7 @@ async def main():
     scheduler = AsyncIOScheduler()
 
     scheduler.add_job(
-        job_function, "cron", minute="*/1", args=[bot_handler]
+        job_function, "cron", minute="*/15", args=[bot_handler]
     )
     scheduler.start()
 

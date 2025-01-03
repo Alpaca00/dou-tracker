@@ -43,6 +43,7 @@ class JobCategory:
 
 class JobCategories(str, Enum):
     """Enumeration representing job categories."""
+
     DOT_NET = ".NET"
     ACCOUNT_MANAGER = "Account Manager"
     AI_ML = "AI/ML"
@@ -166,4 +167,5 @@ class JobCategories(str, Enum):
 
 class QuantityLines(str, Enum):
     """Enumeration representing quantity of days/pages."""
+
     ONE = 1
