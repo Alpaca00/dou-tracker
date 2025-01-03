@@ -1,4 +1,4 @@
-from extension import conf
+from dt.extension import conf
 
 
 def proxy_fetcher_():

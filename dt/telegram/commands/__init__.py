@@ -1,11 +1,13 @@
-from .interface_command import Command
+from .command import Command
 from .invoker_command import CommandInvoker
-from .list_vacancies_command import ListVacanciesCommand
+from .vacancies_command import VacanciesCommand
 from .start_command import StartCommand
+from .subscribe_command import SubscribeVacanciesCommand
 
 __all__ = [
     "Command",
     "CommandInvoker",
-    "ListVacanciesCommand",
+    "VacanciesCommand",
     "StartCommand",
+    "SubscribeVacanciesCommand",
 ]

@@ -2,8 +2,6 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl
-
 COPY ../.. /app
 
 RUN /usr/local/bin/python -m pip install --upgrade pip \
@@ -12,5 +10,5 @@ RUN /usr/local/bin/python -m pip install --upgrade pip \
 RUN useradd -m appuser && chown -R appuser /app
 USER appuser
 
-EXPOSE 8000
+EXPOSE 5000
 CMD [""]

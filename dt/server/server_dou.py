@@ -1,3 +1,11 @@
+import sys
+import os
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+)
+
+
 from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 
@@ -5,7 +13,6 @@ from dt.extension import conf
 from dt.scraper.models import JobCategories, QuantityLines
 from dt.scraper.vacancy_scraper import VacancyScraper
 from dt.server.server_config import Environment
-
 
 
 class VacancyRequest(BaseModel):
@@ -122,9 +129,3 @@ async def dou_vacancies(
     await scraper.fetch_page()
     vacancies = scraper.parse_vacancies(quantity_lines=int(lines))
     return {"response": vacancies}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -1,3 +1,3 @@
-from utils.conf_reader import Config
+from dt.utils.conf_reader import Config
 
 conf = Config()

@@ -5,9 +5,9 @@ import aiohttp
 from bs4 import BeautifulSoup
 from user_agent import generate_user_agent
 
-from scraper.models import MONTHS_MAPPING
-from scraper.vacancy import IVacancy
-from scraper.proxy_manager import ProxyManager
+from dt.scraper.models import MONTHS_MAPPING
+from dt.scraper.vacancy import IVacancy
+from dt.scraper.proxy_manager import ProxyManager
 
 
 class VacancyScraper:

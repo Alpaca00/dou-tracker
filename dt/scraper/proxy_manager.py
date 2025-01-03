@@ -1,5 +1,5 @@
 from typing import Optional
-from scraper.proxy_fetcher.proxy_manager import proxy_fetcher_
+from dt.scraper.proxy_fetcher.proxy_manager import proxy_fetcher_
 
 
 class ProxyManager:
