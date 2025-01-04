@@ -60,7 +60,7 @@ class CommandInvoker:
             else:
                 await callback_query.message.answer(
                     html.quote(
-                        f"Вакансій в категорії {category} ще не опубліковано, на превеликий жаль. Cпробуйте пізніше"
+                        f"Сьогодні вакансій в категорії {category} ще не опубліковано, на превеликий жаль. Cпробуйте пізніше"
                     ),
                     parse_mode=ParseMode.HTML,
                 )
