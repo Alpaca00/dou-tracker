@@ -40,7 +40,7 @@ jobs:
         mkdir -p ~/.ssh
         ssh-keyscan -H $AWS_EC2_HOST >> ~/.ssh/known_hosts
 
-        scp -i key.pem -r ./ $AWS_EC2_USER@$AWS_EC2_HOST:/home/$AWS_EC2_USER/app
+        rsync -av --exclude='.git' ./ $AWS_EC2_USER@$AWS_EC2_HOST:/home/$AWS_EC2_USER/app
 
         ssh -i key.pem $AWS_EC2_USER@$AWS_EC2_HOST << 'EOF'
           cd /home/$USER/app
