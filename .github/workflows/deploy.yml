@@ -36,6 +36,9 @@ jobs:
 
         echo "$AWS_EC2_PRIVATE_KEY" > key.pem
         chmod 600 key.pem
+        
+        mkdir -p ~/.ssh
+        ssh-keyscan -H $AWS_EC2_HOST >> ~/.ssh/known_hosts
 
         scp -i key.pem -r ./ $AWS_EC2_USER@$AWS_EC2_HOST:/home/$AWS_EC2_USER/app
 
