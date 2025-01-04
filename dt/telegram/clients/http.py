@@ -1,17 +1,14 @@
-import os
-
 import aiohttp
 import logging
 
-from dotenv import load_dotenv
+from dt.config import ServerConfig
 
-load_dotenv()
 
 
 class ApiClient:
     def __init__(self, base_url: str):
         self.base_url = base_url
-        self.api_key = os.environ.get("API_KEY")
+        self.api_key = ServerConfig.API_KEY
         self.session = aiohttp.ClientSession()
 
     async def send_request(self, endpoint: str, payload: dict) -> dict:

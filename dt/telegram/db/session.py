@@ -5,12 +5,7 @@ from sqlalchemy import create_engine, cast, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.testing.plugin.plugin_base import logging
 
-from dt.telegram.config.bot_config import (
-    POSTGRES_USER,
-    POSTGRES_PASSWORD,
-    POSTGRES_DB,
-    POSTGRES_HOST,
-)
+from dt.config import DatabaseConfig
 from dt.telegram.models import (
     Base,
     BotUser,
@@ -23,10 +18,10 @@ from dt.telegram.models import (
 class PostgresDatabaseConfig:
     """The database configuration."""
 
-    user = POSTGRES_USER
-    password = POSTGRES_PASSWORD
-    db = POSTGRES_DB
-    host = POSTGRES_HOST
+    user = DatabaseConfig.POSTGRES_USER
+    password = DatabaseConfig.POSTGRES_PASSWORD
+    db = DatabaseConfig.POSTGRES_DB
+    host = DatabaseConfig.POSTGRES_HOST
 
     @classmethod
     def get_database_url(cls):

@@ -1,4 +1,3 @@
-import ast
 import asyncio
 
 import aiohttp
@@ -6,16 +5,16 @@ from aiohttp import ClientError, ClientTimeout
 from bs4 import BeautifulSoup, Tag, NavigableString
 from loguru import logger as l
 
-from dt.extension import conf
+from dt.config import ScrapperConfig, GlobalConfig
 
 
 class ProxyFetcherFreeProxyList:
     def __init__(
         self,
-        proxy_origin_host: str = conf.SCRAPER.proxy_origin_host,
-        proxy_fallback_host: str = conf.SCRAPER.proxy_fallback_host,
-        proxy_verify_host: str = conf.SCRAPER.proxy_verify_host,
-        debug: bool = bool(ast.literal_eval(conf.GLOBAL.logging)),
+        proxy_origin_host: str = ScrapperConfig.PROXY_ORIGIN_HOST,
+        proxy_fallback_host: str = ScrapperConfig.PROXY_FALLBACK_HOST,
+        proxy_verify_host: str = ScrapperConfig.PROXY_VERIFY_HOST,
+        debug: bool = GlobalConfig.LOGGING,
     ):
         self.proxy_origin_host = proxy_origin_host
         self.proxy_fallback_host = proxy_fallback_host

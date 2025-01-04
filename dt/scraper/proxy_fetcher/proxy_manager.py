@@ -1,9 +1,9 @@
-from dt.extension import conf
+from dt.config import ScrapperConfig
 
 
 def proxy_fetcher_():
     """Returns a proxy fetcher based on the URL."""
-    match conf.SCRAPER.proxy_origin_host:
+    match ScrapperConfig.PROXY_ORIGIN_HOST:
         case "https://free-proxy-list.net/":
             from dt.scraper.proxy_fetcher.free_proxy_list import (
                 ProxyFetcherFreeProxyList,

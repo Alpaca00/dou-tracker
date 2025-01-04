@@ -2,22 +2,17 @@ import sys
 import os
 from datetime import timedelta
 import logging
-
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 )
 
 import asyncio
 import httpx
-from dotenv import load_dotenv
 
+from dt.config import ServerConfig, BotConfig
 from dt.telegram.db.session import initialize_database
 from dt.telegram.helpers.formatter import format_html_job_listing
 from dt.scraper.models import JobCategories
-
-
-load_dotenv()
-API_KEY = os.environ.get("API_KEY")
 
 
 def setup_categories(categories: dict):
@@ -60,14 +55,15 @@ async def compare_postgres_documents(category_name, new_data):
 async def check_vacancies(bot_handler, category_name):
     """Check vacancies from the DOU website and notify about changes."""
     payload = {"category": category_name, "quantity_lines": "1"}
-    url = "http://app:5000/api/v1/dou/vacancies"
+    url = BotConfig.VACANCIES_HOST
     headers = {
         "Content-Type": "application/json",
-        "api-key": API_KEY,
+        "api-key": ServerConfig.API_KEY,
     }
 
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        timeout = BotConfig.API_CLIENT_TIMEOUT
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
                 url, json=payload, headers=headers
             )
@@ -119,7 +115,7 @@ def schedule_categories_jobs(scheduler, bot_handler, start_time):
 
     for item, category in enumerate(all_categories, start=1):
         category_name = category.value
-        interval_seconds = 30
+        interval_seconds = BotConfig.SCHEDULER_INTERVAL
         start_date = start_time + timedelta(
             seconds=(item - 1) * interval_seconds
         )

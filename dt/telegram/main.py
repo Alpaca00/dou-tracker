@@ -8,8 +8,9 @@ sys.path.append(
 )
 import asyncio
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from dt.telegram.bot import BotHandler
-from dt.telegram.config.bot_config import TOKEN
+from dt.config import BotConfig
 from dt.telegram.scheduler import (
     schedule_categories_jobs,
     setup_categories,
@@ -18,7 +19,7 @@ from dt.telegram.scheduler import (
 
 async def main():
     """Main entry point of the script."""
-    bot_handler = BotHandler(bot_token=TOKEN)
+    bot_handler = BotHandler(bot_token=BotConfig.TELEGRAM_BOT_TOKEN)
     scheduler = AsyncIOScheduler()
     start_time = datetime.now()
     categories = schedule_categories_jobs(

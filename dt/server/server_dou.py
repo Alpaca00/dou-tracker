@@ -1,18 +1,15 @@
 import sys
 import os
-
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 )
 
-
 from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 
-from dt.extension import conf
+from dt.config import ServerConfig, ScrapperConfig
 from dt.scraper.models import JobCategories, QuantityLines
 from dt.scraper.vacancy_scraper import VacancyScraper
-from dt.server.server_config import Environment
 
 
 class VacancyRequest(BaseModel):
@@ -21,19 +18,19 @@ class VacancyRequest(BaseModel):
 
 
 app = FastAPI(
-    title="DOU Vacancies API",
-    description="API for fetching job vacancies from the DOU website.",
-    version="1.0.0",
+    title=ServerConfig.TITLE,
+    description=ServerConfig.DESCRIPTION,
+    version=ServerConfig.SERVER_VERSION,
 )
 
 
-@app.get("/api/v1/health")
+@app.get(f"/api/{ServerConfig.API_VERSION}/health")
 async def health_check():
     """Health check endpoint."""
     return {"status": "up"}
 
 
-@app.post("/api/v1/dou/vacancies")
+@app.post(f"/api/{ServerConfig.API_VERSION}/dou/vacancies")
 async def dou_vacancies(
     data: VacancyRequest,
     api_key: str = Header(..., description="API key for authentication"),
@@ -110,7 +107,7 @@ async def dou_vacancies(
     - 400: Missing category or day in the request.
     - 403: Invalid API key provided.
     """
-    if api_key != Environment.API_KEY:
+    if api_key != ServerConfig.API_KEY:
         raise HTTPException(
             status_code=403, detail="(error) invalid API key"
         )
@@ -123,7 +120,7 @@ async def dou_vacancies(
         )
 
     scraper = VacancyScraper(
-        url=f"{conf.SCRAPER.main_host}/vacancies/?category={category}",
+        url=f"{ScrapperConfig.MAIN_HOST}/vacancies/?category={category}",
     )
 
     await scraper.fetch_page()
