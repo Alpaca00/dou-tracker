@@ -87,9 +87,6 @@ async def check_vacancies(bot_handler, category_name):
                     ]
                 )
                 chat_ids = get_all_chat_ids_by_subscription(category_name)
-                logging.info(
-                    f"\n\n\nChat IDs for {category_name}: {chat_ids}\n\n\n"
-                )
                 for chat_id in chat_ids:
                     await bot_handler.bot.send_message(
                         chat_id=chat_id,

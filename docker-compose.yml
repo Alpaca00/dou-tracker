@@ -12,9 +12,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2024M
-          cpus: '0.75'
+          memory: 1424M
+          cpus: '1.00'
     command: sh -c "cd '/app' && uvicorn wsgi:app --host 0.0.0.0 --port 5000"
+    volumes:
+      - ./app:/app
   postgres:
     image: postgres:15-alpine
     restart: always
@@ -27,6 +29,8 @@ services:
       retries: 5
       start_period: 30s
       timeout: 5s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
   bot:
     build:
       dockerfile: devops/build/Dockerfile
@@ -38,10 +42,14 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2024M
-          cpus: '1.75'
+          memory: 1424M
+          cpus: '1.00'
     depends_on:
       - app
       - postgres
     command: sh -c "sleep 10 && cd '/app' && python dt/telegram/main.py"
+    volumes:
+      - ./app:/app
 
+volumes:
+  postgres_data:

@@ -1,0 +1,49 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - config.ini
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Verify version change
+      id: check_version
+      run: |
+        if git diff HEAD^ HEAD -- config.ini | grep -q "^+version="; then
+          echo "Version change detected."
+          echo "access_deploy=true" >> $GITHUB_ENV
+        else
+          echo "No version change."
+          echo "access_deploy=false" >> $GITHUB_ENV
+        fi
+
+    - name: Deployment
+      if: env.access_deploy == 'true'
+      env:
+        AWS_EC2_PRIVATE_KEY: ${{ secrets.AWS_EC2_PRIVATE_KEY }}
+        AWS_EC2_USER: ${{ secrets.AWS_EC2_USER }}
+        AWS_EC2_HOST: ${{ secrets.AWS_EC2_HOST }}
+      run: |
+        echo "Starting deployment to EC2..."
+
+        echo "$AWS_EC2_PRIVATE_KEY" > key.pem
+        chmod 600 key.pem
+
+        rsync -avz -e "ssh -i key.pem" ./ $AWS_EC2_USER@$AWS_EC2_HOST:/home/$USER/app
+
+        ssh -i key.pem $AWS_EC2_USER@$AWS_EC2_HOST << 'EOF'
+          cd /home/$USER/app
+          source /home/$USER/.bash_profile
+          docker-compose down
+          docker-compose up -d
+        EOF
+        echo "Deployment completed."
