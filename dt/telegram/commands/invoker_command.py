@@ -3,6 +3,7 @@ import logging
 from aiogram.enums import ParseMode
 from aiogram import html
 
+from dt.config import BotConfig
 from dt.telegram.clients.http import ApiClient
 from dt.telegram.commands import Command
 from dt.telegram.db.session import initialize_database
@@ -31,12 +32,12 @@ class CommandInvoker:
 
         category = callback_query.data.split("_")[1]
 
-        api_client = ApiClient(base_url="http://app:5000")
+        api_client = ApiClient(base_url=BotConfig.API_CLIENT_BASE_URL)
 
         payload = {"category": category, "quantity_lines": "1"}
 
         data = await api_client.send_request(
-            "/api/v1/dou/vacancies", payload
+            BotConfig.API_CLIENT_ENDPOINT, payload
         )
         if data:
             job_listings = "\n".join(
@@ -79,7 +80,10 @@ class CommandInvoker:
             user_subscriptions = db.get_user_subscriptions(
                 user_id=callback_query.from_user.id
             )
-            if len(user_subscriptions) >= 3:
+            if (
+                len(user_subscriptions)
+                >= BotConfig.USER_SUBSCRIPTIONS_LIMIT
+            ):
                 await callback_query.message.answer(
                     html.quote(
                         "Ви не можете підписатись на більше 3 категорій вакансій"

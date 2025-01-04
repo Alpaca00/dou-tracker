@@ -79,23 +79,6 @@ class DatabaseManagerPostgreSQL:
             )
 
     @staticmethod
-    def get_all_users():
-        """Get all users from the database."""
-        with SessionManager() as session:
-            return session.query(BotUser).all()
-
-    @staticmethod
-    def delete_user(user_id: str):
-        """Delete a user from the database."""
-        with SessionManager() as session:
-            user = (
-                session.query(BotUser)
-                .filter_by(user_id=cast(user_id, String))
-                .first()
-            )
-            session.delete(user)
-
-    @staticmethod
     def add_subscribe_vacancy(user_id: str, subscription_name: str):
         """Subscribe a user to a vacancy."""
         try:
@@ -141,14 +124,16 @@ class DatabaseManagerPostgreSQL:
             ]
 
     @staticmethod
-    def get_all_subscriptions():
-        """Get all subscriptions."""
+    def get_chat_ids_by_subscription(subscription_name: str):
+        """Get chat IDs by subscription."""
         with SessionManager() as session:
             subscriptions = (
-                session.query(UserSubscription).distinct().all()
+                session.query(UserSubscription)
+                .filter_by(subscription_name=subscription_name)
+                .all()
             )
             return [
-                subscription.subscription_name
+                subscription.user.chat_id
                 for subscription in subscriptions
             ]
 
@@ -160,14 +145,6 @@ class DatabaseManagerPostgreSQL:
             session.add(category)
 
     @staticmethod
-    def get_category_by_name(name: str):
-        """Get a category by name."""
-        with SessionManager() as session:
-            return (
-                session.query(Category).filter_by(name=name).one_or_none()
-            )
-
-    @staticmethod
     def add_job(
         title: str,
         company: str,
@@ -175,6 +152,7 @@ class DatabaseManagerPostgreSQL:
         description: str,
         link: str,
         category_name: str,
+        formatted: str,
     ):
         """Add a job to the database."""
         try:
@@ -194,6 +172,7 @@ class DatabaseManagerPostgreSQL:
                     description=description,
                     link=link,
                     category=category,
+                    formatted=formatted,
                 )
                 session.add(job)
         except IntegrityError as e:
@@ -211,12 +190,6 @@ class DatabaseManagerPostgreSQL:
             if category:
                 return category.jobs
             return []
-
-    @staticmethod
-    def get_all_categories():
-        """Get all categories."""
-        with SessionManager() as session:
-            return session.query(Category).all()
 
 
 Base.metadata.create_all(engine)

@@ -25,7 +25,7 @@ class Job(Base):
     company = Column(String, nullable=False)
     location = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    link = Column(String, nullable=True)
+    link = Column(String, nullable=False)
     formatted = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 

@@ -2,6 +2,7 @@ import sys
 import os
 from datetime import timedelta
 import logging
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 )
@@ -22,10 +23,15 @@ def setup_categories(categories: dict):
         db.add_category(name, description)
 
 
-async def save_to_postgres(category_name, new_data):
+def get_all_chat_ids_by_subscription(category_name):
+    """Get all chat IDs by subscription."""
+    db = initialize_database()
+    return db.get_chat_ids_by_subscription(category_name)
+
+
+def save_to_postgres(category_name, new_data):
     """Save data to PostgreSQL."""
     db = initialize_database()
-    db.add_category(category_name)
     for job in new_data:
         db.add_job(
             title=job["title"],
@@ -33,22 +39,18 @@ async def save_to_postgres(category_name, new_data):
             location=job["location"],
             description=job["description"],
             link=job["link"],
-            formatted="<code>-------------------------</code>",
+            formatted="\n",
             category_name=category_name,
         )
 
 
-async def compare_postgres_documents(category_name, new_data):
+def compare_postgres_documents(category_name, new_data):
     """Compare new job data with existing records in PostgreSQL."""
     db = initialize_database()
-    existing_category = db.get_category_by_name(category_name)
-    if not existing_category:
-        return []
     jobs_by_category = db.get_jobs_by_category(category_name)
-
-    new_jobs = [
-        job for job in new_data if job["link"] not in jobs_by_category
-    ]
+    links = [job.link for job in jobs_by_category]
+    logging.info(f"Jobs by category: {links}")
+    new_jobs = [job for job in new_data if job["link"] not in links]
     return new_jobs
 
 
@@ -70,12 +72,11 @@ async def check_vacancies(bot_handler, category_name):
             response.raise_for_status()
 
             new_data = response.json().get("response", [])
-            new_jobs = await compare_postgres_documents(
-                category_name, new_data
-            )
+            logging.info(f"New data for {category_name}: {new_data}")
+            new_jobs = compare_postgres_documents(category_name, new_data)
 
             if new_jobs:
-                await save_to_postgres(category_name, new_data)
+                save_to_postgres(category_name, new_data)
 
                 job_listings = "\n".join(
                     [
@@ -85,12 +86,16 @@ async def check_vacancies(bot_handler, category_name):
                         for job in new_jobs
                     ]
                 )
-
-                await bot_handler.bot.send_message(
-                    chat_id=1319159640,
-                    text=job_listings,
-                    parse_mode="HTML",
+                chat_ids = get_all_chat_ids_by_subscription(category_name)
+                logging.info(
+                    f"\n\n\nChat IDs for {category_name}: {chat_ids}\n\n\n"
                 )
+                for chat_id in chat_ids:
+                    await bot_handler.bot.send_message(
+                        chat_id=chat_id,
+                        text=job_listings,
+                        parse_mode="HTML",
+                    )
             else:
                 logging.info("No new or changed job listings.")
     except httpx.RequestError as e:

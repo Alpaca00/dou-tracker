@@ -22,17 +22,19 @@ class GlobalConfig:
 class ServerConfig:
     TITLE = "DOU Vacancies API"
     DESCRIPTION = "API for fetching job vacancies from the DOU website."
-    SERVER_VERSION = "1.0.0"
-    API_VERSION = "v1"
+    SERVER_VERSION = conf.SERVER.server_version
+    API_VERSION = conf.SERVER.api_version
     API_KEY = os.environ.get("API_KEY")
 
 
 class BotConfig:
     TELEGRAM_BOT_TOKEN = os.environ.get("BOT_TELEGRAM_TOKEN")
     VACANCIES_HOST = conf.BOT.vacancies_host
-    API_CLIENT = conf.BOT.api_client_base_url
+    API_CLIENT_BASE_URL = conf.BOT.api_client_base_url
+    API_CLIENT_ENDPOINT = conf.BOT.api_client_endpoint
     API_CLIENT_TIMEOUT = int(conf.BOT.api_client_timeout)
     SCHEDULER_INTERVAL = int(conf.BOT.scheduler_interval)
+    USER_SUBSCRIPTIONS_LIMIT = int(conf.BOT.user_subscriptions_limit)
 
 
 class DatabaseConfig:
