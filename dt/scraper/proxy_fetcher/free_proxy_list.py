@@ -12,10 +12,10 @@ from dt.extension import conf
 class ProxyFetcherFreeProxyList:
     def __init__(
         self,
-        proxy_origin_host: str = conf.URI.proxy_origin_host,
-        proxy_fallback_host: str = conf.URI.proxy_fallback_host,
-        proxy_verify_host: str = conf.URI.proxy_verify_host,
-        debug: bool = bool(ast.literal_eval(conf.PROJECT.logging)),
+        proxy_origin_host: str = conf.SCRAPER.proxy_origin_host,
+        proxy_fallback_host: str = conf.SCRAPER.proxy_fallback_host,
+        proxy_verify_host: str = conf.SCRAPER.proxy_verify_host,
+        debug: bool = bool(ast.literal_eval(conf.GLOBAL.logging)),
     ):
         self.proxy_origin_host = proxy_origin_host
         self.proxy_fallback_host = proxy_fallback_host

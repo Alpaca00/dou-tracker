@@ -40,7 +40,10 @@ class CommandInvoker:
         )
         if data:
             job_listings = "\n".join(
-                [format_html_job_listing(job) for job in data["response"]]
+                [
+                    format_html_job_listing(job=job, category=category)
+                    for job in data["response"]
+                ]
             )
 
             if data["response"]:
@@ -57,7 +60,7 @@ class CommandInvoker:
             else:
                 await callback_query.message.answer(
                     html.quote(
-                        "Вакансій сьогодні немає, на превеликий жаль. Cпробуйте пізніше"
+                        f"Вакансій в категорії {category} ще не опубліковано, на превеликий жаль. Cпробуйте пізніше"
                     ),
                     parse_mode=ParseMode.HTML,
                 )

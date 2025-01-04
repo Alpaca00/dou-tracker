@@ -123,7 +123,7 @@ async def dou_vacancies(
         )
 
     scraper = VacancyScraper(
-        url=f"{conf.URI.main_host}/vacancies/?category={category}",
+        url=f"{conf.SCRAPER.main_host}/vacancies/?category={category}",
     )
 
     await scraper.fetch_page()

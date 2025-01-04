@@ -11,7 +11,13 @@ from dt.telegram.config.bot_config import (
     POSTGRES_DB,
     POSTGRES_HOST,
 )
-from dt.telegram.models import Base, BotUser, UserSubscription
+from dt.telegram.models import (
+    Base,
+    BotUser,
+    UserSubscription,
+    Category,
+    Job,
+)
 
 
 class PostgresDatabaseConfig:
@@ -150,6 +156,72 @@ class DatabaseManagerPostgreSQL:
                 subscription.subscription_name
                 for subscription in subscriptions
             ]
+
+    @staticmethod
+    def add_category(name: str, description: str = None):
+        """Add a category to the database."""
+        with SessionManager() as session:
+            category = Category(name=name, description=description)
+            session.add(category)
+
+    @staticmethod
+    def get_category_by_name(name: str):
+        """Get a category by name."""
+        with SessionManager() as session:
+            return (
+                session.query(Category).filter_by(name=name).one_or_none()
+            )
+
+    @staticmethod
+    def add_job(
+        title: str,
+        company: str,
+        location: str,
+        description: str,
+        link: str,
+        category_name: str,
+    ):
+        """Add a job to the database."""
+        try:
+            with SessionManager() as session:
+                category = (
+                    session.query(Category)
+                    .filter_by(name=category_name)
+                    .first()
+                )
+                if not category:
+                    category = Category(name=category_name)
+                    session.add(category)
+                job = Job(
+                    title=title,
+                    company=company,
+                    location=location,
+                    description=description,
+                    link=link,
+                    category=category,
+                )
+                session.add(job)
+        except IntegrityError as e:
+            logging.error(f"Error: {e}")
+
+    @staticmethod
+    def get_jobs_by_category(category_name: str):
+        """Get jobs by category."""
+        with SessionManager() as session:
+            category = (
+                session.query(Category)
+                .filter_by(name=category_name)
+                .first()
+            )
+            if category:
+                return category.jobs
+            return []
+
+    @staticmethod
+    def get_all_categories():
+        """Get all categories."""
+        with SessionManager() as session:
+            return session.query(Category).all()
 
 
 Base.metadata.create_all(engine)
