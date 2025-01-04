@@ -22,7 +22,7 @@ jobs:
           echo "No version change."
         else
           echo "Version change detected."
-          echo "deploy=true" >> $GITHUB_ENV
+          echo "access_deploy=true" >> $GITHUB_ENV
         fi
 
     - name: Deployment
