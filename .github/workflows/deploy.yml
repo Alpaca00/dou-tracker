@@ -18,12 +18,11 @@ jobs:
     - name: Verify version change
       id: check_version
       run: |
-        if git diff HEAD^ HEAD -- config.ini | grep -q "^+version="; then
-          echo "Version change detected."
-          echo "access_deploy=true" >> $GITHUB_ENV
-        else
+        if git diff --quiet HEAD^ HEAD -- config.ini 2>/dev/null; then
           echo "No version change."
-          echo "access_deploy=false" >> $GITHUB_ENV
+        else
+          echo "Version change detected."
+          echo "deploy=true" >> $GITHUB_ENV
         fi
 
     - name: Deployment
