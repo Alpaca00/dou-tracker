@@ -14,7 +14,7 @@ services:
         limits:
           memory: 1424M
           cpus: '1.00'
-    command: uvicorn wsgi:app --host 0.0.0.0 --port 5000"
+    command: uvicorn wsgi:app --host 0.0.0.0 --port 5000
   postgres:
     image: postgres:15-alpine
     restart: always
