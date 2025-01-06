@@ -13,7 +13,7 @@ def format_html_job_listing(job: dict, category: Optional[str] = None) -> str:
         else job_description
     )
     job_link = job["link"]
-    separator = "<code>-------------------------</code>"
+    separator = "\n"
     job_description = job_description.replace("\n\n", " ")
     job_description = job_description.replace("\n\n\n", " ")
     category = f"Subscription: {category}\n" if category else ""
