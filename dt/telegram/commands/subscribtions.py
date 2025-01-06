@@ -14,9 +14,17 @@ class SubscriptionsCommand(Command):
             user_subscriptions = db.get_user_subscriptions(
                 user_id=message.from_user.id
             )
-            await message.answer(
-                html.quote(
-                    f"Ваші підписки:\n{', '.join(user_subscriptions)}"
-                ),
-                parse_mode=ParseMode.HTML,
-            )
+            if not user_subscriptions:
+                await message.answer(
+                    html.quote(
+                        "Ви не підписані на жодну категорію вакансій"
+                    ),
+                    parse_mode=ParseMode.HTML,
+                )
+            else:
+                await message.answer(
+                    html.quote(
+                        f"Ваші підписки:\n{', '.join(user_subscriptions)}"
+                    ),
+                    parse_mode=ParseMode.HTML,
+                )
