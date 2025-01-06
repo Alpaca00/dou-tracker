@@ -77,22 +77,15 @@ async def check_vacancies(bot_handler, category_name):
 
             if new_jobs:
                 save_to_postgres(category_name, new_data)
-
-                job_listings = "\n".join(
-                    [
-                        format_html_job_listing(
-                            job=job, category=category_name
-                        )
-                        for job in new_jobs
-                    ]
-                )
                 chat_ids = get_all_chat_ids_by_subscription(category_name)
                 for chat_id in chat_ids:
-                    await bot_handler.bot.send_message(
-                        chat_id=chat_id,
-                        text=job_listings,
-                        parse_mode="HTML",
-                    )
+                    for job in new_jobs:
+                        job_listing = format_html_job_listing(job=job, category=category_name)
+                        await bot_handler.bot.send_message(
+                            chat_id=chat_id,
+                            text=job_listing,
+                            parse_mode="HTML",
+                        )
             else:
                 logging.info("No new or changed job listings.")
     except httpx.RequestError as e:
