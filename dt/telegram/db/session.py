@@ -145,6 +145,15 @@ class DatabaseManagerPostgreSQL:
             session.add(category)
 
     @staticmethod
+    def delete_categories():
+        """Delete all categories."""
+        try:
+            with SessionManager() as session:
+                session.query(Category).delete()
+        except IntegrityError as e:
+            logging.error(f"Error: {e}")
+
+    @staticmethod
     def add_job(
         title: str,
         company: str,
@@ -190,6 +199,12 @@ class DatabaseManagerPostgreSQL:
             if category:
                 return category.jobs
             return []
+
+    @staticmethod
+    def delete_all_jobs():
+        """Delete all jobs."""
+        with SessionManager() as session:
+            session.query(Job).delete()
 
 
 Base.metadata.create_all(engine)
