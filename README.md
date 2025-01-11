@@ -4,7 +4,7 @@ Helpful bot for tracking vacancies in the [Dou](https://jobs.dou.ua/) job board.
 
 Telegram bot: [@DouTrackerBot](https://t.me/DouTrackerBot)
 
-![User Count](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Alpaca00/dou-tracker/master/stats.json&style=social)
+![User Count](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Alpaca00/dou-tracker/refs/heads/master/stats.json&style=social)
 
 #### Commands
 
