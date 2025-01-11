@@ -3,8 +3,8 @@ import logging
 from aiogram.enums import ParseMode
 from aiogram import html
 
-from dt.config import BotConfig
-from dt.telegram.clients.http import ApiClient
+from dt.config import BotConfig, ServerConfig
+from dt.telegram.clients.http import AioHttpApiClient, VacancyClient
 from dt.telegram.commands import Command
 from dt.telegram.db.session import initialize_database
 from dt.telegram.helpers.formatter import format_html_job_listing
@@ -32,12 +32,14 @@ class CommandInvoker:
 
         category = callback_query.data.split("_")[1]
 
-        api_client = ApiClient(base_url=BotConfig.API_CLIENT_BASE_URL)
-
-        payload = {"category": category, "quantity_lines": "1"}
-
-        data = await api_client.send_request(
-            BotConfig.API_CLIENT_ENDPOINT, payload
+        api_client = AioHttpApiClient(
+            base_url=BotConfig.API_CLIENT_BASE_URL,
+            api_key=ServerConfig.API_KEY,
+            timeout=BotConfig.API_CLIENT_TIMEOUT,
+        )
+        vacancy_client = VacancyClient(api_client=api_client)
+        data = await vacancy_client.fetch_vacancies(
+            category_name=category, quantity_lines=1
         )
         if data:
             job_listings = "\n".join(

@@ -3,13 +3,12 @@ import os
 from datetime import timedelta
 import logging
 
+from apscheduler.triggers.cron import CronTrigger
+
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 )
-
-import asyncio
-import httpx
-
+from dt.telegram.clients.http import VacancyClient, HttpxApiClient
 from dt.config import ServerConfig, BotConfig
 from dt.telegram.db.session import initialize_database
 from dt.telegram.helpers.formatter import format_html_job_listing
@@ -19,8 +18,15 @@ from dt.scraper.models import JobCategories
 def setup_categories(categories: dict):
     """Setup categories in PostgreSQL."""
     db = initialize_database()
+    db.delete_categories()
     for name, description in categories.items():
         db.add_category(name, description)
+
+
+def clear_jobs():
+    """Clear all jobs in PostgreSQL."""
+    db = initialize_database()
+    db.delete_all_jobs()
 
 
 def get_all_chat_ids_by_subscription(category_name):
@@ -49,53 +55,40 @@ def compare_postgres_documents(category_name, new_data):
     db = initialize_database()
     jobs_by_category = db.get_jobs_by_category(category_name)
     links = [job.link for job in jobs_by_category]
-    logging.info(f"Jobs by category: {links}")
     new_jobs = [job for job in new_data if job["link"] not in links]
     return new_jobs
 
 
 async def check_vacancies(bot_handler, category_name):
     """Check vacancies from the DOU website and notify about changes."""
-    payload = {"category": category_name, "quantity_lines": "1"}
-    url = BotConfig.VACANCIES_HOST
-    headers = {
-        "Content-Type": "application/json",
-        "api-key": ServerConfig.API_KEY,
-    }
-
+    api_client = HttpxApiClient(
+        base_url=BotConfig.API_CLIENT_BASE_URL,
+        api_key=ServerConfig.API_KEY,
+        timeout=BotConfig.API_CLIENT_TIMEOUT,
+    )
+    vacancy_client = VacancyClient(api_client=api_client)
     try:
-        timeout = BotConfig.API_CLIENT_TIMEOUT
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            response = await client.post(
-                url, json=payload, headers=headers
-            )
-            response.raise_for_status()
+        new_data = await vacancy_client.fetch_vacancies(category_name)
 
-            new_data = response.json().get("response", [])
-            logging.info(f"New data for {category_name}: {new_data}")
-            new_jobs = compare_postgres_documents(category_name, new_data)
+        new_jobs = compare_postgres_documents(category_name, new_data)
 
-            if new_jobs:
-                save_to_postgres(category_name, new_data)
-                chat_ids = get_all_chat_ids_by_subscription(category_name)
-                for chat_id in chat_ids:
-                    for job in new_jobs:
-                        job_listing = format_html_job_listing(job=job, category=category_name)
-                        await bot_handler.bot.send_message(
-                            chat_id=chat_id,
-                            text=job_listing,
-                            parse_mode="HTML",
-                        )
-            else:
-                logging.info("No new or changed job listings.")
-    except httpx.RequestError as e:
-        logging.error(f"An error occurred while requesting data: {e}")
-    except httpx.HTTPStatusError as e:
-        logging.error(f"HTTP error occurred: {e}")
-    except asyncio.TimeoutError:
-        logging.error("Request timed out.")
+        if new_jobs:
+            save_to_postgres(category_name, new_data)
+            chat_ids = get_all_chat_ids_by_subscription(category_name)
+            for chat_id in chat_ids:
+                for job in new_jobs:
+                    job_listing = format_html_job_listing(
+                        job=job, category=category_name
+                    )
+                    await bot_handler.bot.send_message(
+                        chat_id=chat_id,
+                        text=job_listing,
+                        parse_mode="HTML",
+                    )
+        else:
+            logging.info("No new or changed job listings.")
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
+        logging.error(f"An error occurred: {e}")
 
 
 async def job_function(bot_handler, category_name):
@@ -108,6 +101,12 @@ def schedule_categories_jobs(scheduler, bot_handler, start_time):
     all_categories = JobCategories.get_all_categories()
     categories = {}
 
+    scheduler.add_job(
+        clear_jobs,
+        trigger=CronTrigger(hour=0, minute=0, second=0),
+        id="clear_jobs_task",
+        replace_existing=True,
+    )
     for item, category in enumerate(all_categories, start=1):
         category_name = category.value
         interval_seconds = BotConfig.SCHEDULER_INTERVAL

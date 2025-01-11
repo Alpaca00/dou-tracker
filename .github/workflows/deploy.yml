@@ -46,6 +46,7 @@ jobs:
           cd /home/$USER/app
           rm -rf key.pem
           docker-compose down
+          docker system prune -a
           docker-compose up -d
         EOF
         echo "Deployment completed."
