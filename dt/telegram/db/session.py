@@ -149,6 +149,7 @@ class DatabaseManagerPostgreSQL:
         """Delete all categories."""
         try:
             with SessionManager() as session:
+                session.query(Job).delete()
                 session.query(Category).delete()
         except IntegrityError as e:
             logging.error(f"Error: {e}")
